@@ -1,7 +1,6 @@
 package redis_namespace
 
 import (
-	"fmt"
 	"github.com/alicebob/miniredis"
 	"github.com/go-redis/redis/v7"
 	"github.com/stretchr/testify/suite"
@@ -18,25 +17,32 @@ type ClientTestSuite struct {
 	redisClientWithNamespace *Client
 }
 
-func (suite *ClientTestSuite) SetupTest() {
+func (s *ClientTestSuite) SetupTest() {
 	mr, err := miniredis.Run()
-	suite.Require().NoError(err)
+	s.Require().NoError(err)
 
-	suite.redisClient = redis.NewClient(&redis.Options{
+	s.redisClient = redis.NewClient(&redis.Options{
 		Addr: mr.Addr(),
 	})
 
-	suite.redisClientWithNamespace = NewGoRedisWithNamespace("test_namespace", suite.redisClient)
+	s.redisClientWithNamespace = NewGoRedisWithNamespace("test_namespace", s.redisClient)
 }
 
-func (suite *ClientTestSuite) TestNewClient() {
-	_, err := suite.redisClientWithNamespace.Ping().Result()
-	suite.Require().NoError(err)
+func (s *ClientTestSuite) TestPing() {
+	_, err := s.redisClientWithNamespace.Ping().Result()
+	s.Nil(err)
+}
 
-	resultSet := suite.redisClientWithNamespace.Set("key", "value", 0)
-	suite.Nil(resultSet.Err())
-	resultGet := suite.redisClientWithNamespace.Get("key")
-	fmt.Print(resultGet)
+func (s *ClientTestSuite) TestGet_Set() {
+	resultSet := s.redisClientWithNamespace.Set("key", "value", 0)
+	s.Nil(resultSet.Err())
+
+	keys := s.redisClientWithNamespace.Keys("*")
+	s.Equal(1, len(keys.Val()))
+	s.Equal("key", keys.Val()[0])
+
+	resultGet := s.redisClientWithNamespace.Get("key")
+	s.Equal(resultGet.Val(), "value")
 }
 
 func TestClientTestSuite(t *testing.T) {

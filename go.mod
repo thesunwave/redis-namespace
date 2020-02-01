@@ -1,4 +1,4 @@
-module redis-namespace
+module github.com/thesunwave/redis-namespace
 
 go 1.13
 
