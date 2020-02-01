@@ -45,6 +45,36 @@ func (s *ClientTestSuite) TestGet_Set() {
 	s.Equal(resultGet.Val(), "value")
 }
 
+func (s *ClientTestSuite) TestClient_Del() {
+	resultSet := s.redisClientWithNamespace.Set("key", "value", 0)
+	s.Nil(resultSet.Err())
+	resultSet = s.redisClientWithNamespace.Set("key2", "value", 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.Del("key", "key2")
+	s.EqualValues(2, result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_Unlink() {
+	resultSet := s.redisClientWithNamespace.Set("key", "value", 0)
+	s.Nil(resultSet.Err())
+	resultSet = s.redisClientWithNamespace.Set("key2", "value", 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.Unlink("key", "key2")
+	s.Nil(result.Err())
+	s.EqualValues(2, result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_Dump() {
+	resultSet := s.redisClientWithNamespace.Set("key", 10, 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.Dump("key")
+	s.Nil(result.Err())
+	s.EqualValues("\u0000\xC0\n\t\u0000\xBEm\u0006\x89Z(\u0000\n", result.Val())
+}
+
 func TestClientTestSuite(t *testing.T) {
 	suite.Run(t, new(ClientTestSuite))
 }
