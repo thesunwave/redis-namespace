@@ -45,15 +45,20 @@ func (c *Client) Dump(key string) *redis.StringCmd {
 }
 
 func (c *Client) Exists(keys ...string) *redis.IntCmd {
-	panic("implement me")
+	var wrappedKeys []string
+
+	for _, key := range keys {
+		wrappedKeys = append(wrappedKeys, c.namespace+key)
+	}
+	return c.client.Exists(wrappedKeys...)
 }
 
 func (c *Client) Expire(key string, expiration time.Duration) *redis.BoolCmd {
-	panic("implement me")
+	return c.client.Expire(c.namespace+key, expiration)
 }
 
 func (c *Client) ExpireAt(key string, tm time.Time) *redis.BoolCmd {
-	panic("implement me")
+	return c.client.ExpireAt(c.namespace+key, tm)
 }
 
 func (c *Client) Keys(pattern string) *redis.StringSliceCmd {
