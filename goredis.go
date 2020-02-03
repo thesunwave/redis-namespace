@@ -92,31 +92,27 @@ func (c *Client) ObjectRefCount(key string) *redis.IntCmd {
 }
 
 func (c *Client) ObjectEncoding(key string) *redis.StringCmd {
-	panic("implement me")
+	return c.client.ObjectEncoding(c.namespace + key)
 }
 
 func (c *Client) ObjectIdleTime(key string) *redis.DurationCmd {
-	panic("implement me")
+	return c.client.ObjectIdleTime(c.namespace + key)
 }
 
 func (c *Client) Persist(key string) *redis.BoolCmd {
-	panic("implement me")
+	return c.client.Persist(c.namespace + key)
 }
 
 func (c *Client) PExpire(key string, expiration time.Duration) *redis.BoolCmd {
-	panic("implement me")
+	return c.client.PExpire(c.namespace+key, expiration)
 }
 
 func (c *Client) PExpireAt(key string, tm time.Time) *redis.BoolCmd {
-	panic("implement me")
+	return c.client.PExpireAt(c.namespace+key, tm)
 }
 
 func (c *Client) PTTL(key string) *redis.DurationCmd {
-	panic("implement me")
-}
-
-func (c *Client) RandomKey() *redis.StringCmd {
-	panic("implement me")
+	return c.client.PTTL(c.namespace + key)
 }
 
 func (c *Client) Rename(key, newkey string) *redis.StatusCmd {
@@ -715,14 +711,6 @@ func (c *Client) PFMerge(dest string, keys ...string) *redis.StatusCmd {
 	panic("implement me")
 }
 
-func (c *Client) BgRewriteAOF() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) BgSave() *redis.StatusCmd {
-	panic("implement me")
-}
-
 func (c *Client) ClientKill(ipPort string) *redis.StatusCmd {
 	panic("implement me")
 }
@@ -759,79 +747,11 @@ func (c *Client) ConfigRewrite() *redis.StatusCmd {
 	panic("implement me")
 }
 
-func (c *Client) DBSize() *redis.IntCmd {
-	panic("implement me")
-}
-
-func (c *Client) FlushAll() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) FlushAllAsync() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) FlushDB() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) FlushDBAsync() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) Info(section ...string) *redis.StringCmd {
-	panic("implement me")
-}
-
-func (c *Client) LastSave() *redis.IntCmd {
-	panic("implement me")
-}
-
-func (c *Client) Save() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) Shutdown() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) ShutdownSave() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) ShutdownNoSave() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) SlaveOf(host, port string) *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) Time() *redis.TimeCmd {
-	panic("implement me")
-}
-
 func (c *Client) Eval(script string, keys []string, args ...interface{}) *redis.Cmd {
 	panic("implement me")
 }
 
 func (c *Client) EvalSha(sha1 string, keys []string, args ...interface{}) *redis.Cmd {
-	panic("implement me")
-}
-
-func (c *Client) ScriptExists(hashes ...string) *redis.BoolSliceCmd {
-	panic("implement me")
-}
-
-func (c *Client) ScriptFlush() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) ScriptKill() *redis.StatusCmd {
-	panic("implement me")
-}
-
-func (c *Client) ScriptLoad(script string) *redis.StringCmd {
 	panic("implement me")
 }
 

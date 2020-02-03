@@ -1,7 +1,7 @@
 package redis_namespace
 
 import (
-	"github.com/alicebob/miniredis"
+	_ "github.com/alicebob/miniredis"
 	"github.com/go-redis/redis/v7"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -19,11 +19,11 @@ type ClientTestSuite struct {
 }
 
 func (s *ClientTestSuite) SetupTest() {
-	mr, err := miniredis.Run()
-	s.Require().NoError(err)
+	//mr, err := miniredis.Run()
+	//s.Require().NoError(err)
 
 	s.redisClient = redis.NewClient(&redis.Options{
-		Addr: mr.Addr(),
+		Addr: "localhost:6379",
 	})
 
 	s.redisClientWithNamespace = NewGoRedisWithNamespace("test_namespace", s.redisClient)
@@ -111,6 +111,61 @@ func (s *ClientTestSuite) TestClient_ObjectRefCount() {
 	result := s.redisClientWithNamespace.ObjectRefCount("mylist")
 	s.Nil(result.Err())
 	s.EqualValues(1, result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_ObjectEncoding() {
+	resultSet := s.redisClientWithNamespace.Set("key", "value", 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.ObjectEncoding("key")
+	s.Nil(result.Err())
+	s.EqualValues("embstr", result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_ObjectIdleTime() {
+	resultSet := s.redisClientWithNamespace.Set("key", "value", 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.ObjectIdleTime("key")
+	s.Nil(result.Err())
+	s.EqualValues(0, result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_Persist() {
+	resultSet := s.redisClientWithNamespace.Set("key", "value", 10*time.Second)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.Persist("key")
+	s.Nil(result.Err())
+	s.EqualValues(true, result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_PExpire() {
+	resultSet := s.redisClientWithNamespace.Set("key", 10, 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.PExpire("key", 10*time.Second)
+	s.Nil(result.Err())
+	s.EqualValues(true, result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_PExpireAt() {
+	resultSet := s.redisClientWithNamespace.Set("key", 10, 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.PExpireAt("key", time.Now().Add(10*time.Second))
+	s.Nil(result.Err())
+	s.EqualValues(true, result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_PTTL() {
+	// Need to mock that case
+	//resultSet := s.redisClientWithNamespace.Set("key", 10, 1 * time.Second)
+	//s.Nil(resultSet.Err())
+	//
+	//result := s.redisClientWithNamespace.PTTL("key")
+	//s.Nil(result.Err())
+	//s.EqualValues(999, result.Val()) // => we can't do that because of using real Redis connection
 }
 
 func TestClientTestSuite(t *testing.T) {
