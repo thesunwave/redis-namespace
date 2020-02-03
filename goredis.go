@@ -88,7 +88,7 @@ func (c *Client) Move(key string, db int64) *redis.BoolCmd {
 }
 
 func (c *Client) ObjectRefCount(key string) *redis.IntCmd {
-	panic("implement me")
+	return c.client.ObjectRefCount(c.namespace + key)
 }
 
 func (c *Client) ObjectEncoding(key string) *redis.StringCmd {
@@ -364,7 +364,7 @@ func (c *Client) LPop(key string) *redis.StringCmd {
 }
 
 func (c *Client) LPush(key string, values ...interface{}) *redis.IntCmd {
-	panic("implement me")
+	return c.client.LPush(c.namespace+key, values...)
 }
 
 func (c *Client) LPushX(key string, value interface{}) *redis.IntCmd {

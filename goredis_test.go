@@ -27,6 +27,7 @@ func (s *ClientTestSuite) SetupTest() {
 	})
 
 	s.redisClientWithNamespace = NewGoRedisWithNamespace("test_namespace", s.redisClient)
+	s.redisClient.FlushAll()
 }
 
 func (s *ClientTestSuite) TestPing() {
@@ -101,6 +102,15 @@ func (s *ClientTestSuite) TestClient_ExpireAt() {
 	result := s.redisClientWithNamespace.ExpireAt("key", time.Now().Add(10*time.Second))
 	s.Nil(result.Err())
 	s.EqualValues(true, result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_ObjectRefCount() {
+	resultSet := s.redisClientWithNamespace.LPush("mylist", "value")
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.ObjectRefCount("mylist")
+	s.Nil(result.Err())
+	s.EqualValues(1, result.Val())
 }
 
 func TestClientTestSuite(t *testing.T) {
