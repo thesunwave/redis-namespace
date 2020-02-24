@@ -116,11 +116,11 @@ func (c *Client) PTTL(key string) *redis.DurationCmd {
 }
 
 func (c *Client) Rename(key, newkey string) *redis.StatusCmd {
-	panic("implement me")
+	return c.client.Rename(c.namespace+key, c.namespace+newkey)
 }
 
 func (c *Client) RenameNX(key, newkey string) *redis.BoolCmd {
-	panic("implement me")
+	return c.client.RenameNX(c.namespace+key, c.namespace+newkey)
 }
 
 func (c *Client) Restore(key string, ttl time.Duration, value string) *redis.StatusCmd {

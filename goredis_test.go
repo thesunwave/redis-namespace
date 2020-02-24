@@ -1,6 +1,7 @@
 package redis_namespace
 
 import (
+	"fmt"
 	_ "github.com/alicebob/miniredis"
 	"github.com/go-redis/redis/v7"
 	"github.com/stretchr/testify/suite"
@@ -16,17 +17,18 @@ type ClientTestSuite struct {
 
 	redisClient              GoRedis
 	redisClientWithNamespace *Client
+
+	namespace string
 }
 
 func (s *ClientTestSuite) SetupTest() {
-	//mr, err := miniredis.Run()
-	//s.Require().NoError(err)
-
 	s.redisClient = redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
 	})
 
-	s.redisClientWithNamespace = NewGoRedisWithNamespace("test_namespace", s.redisClient)
+	s.namespace = "test_namespace"
+
+	s.redisClientWithNamespace = NewGoRedisWithNamespace(s.namespace, s.redisClient)
 	s.redisClient.FlushAll()
 }
 
@@ -166,6 +168,27 @@ func (s *ClientTestSuite) TestClient_PTTL() {
 	//result := s.redisClientWithNamespace.PTTL("key")
 	//s.Nil(result.Err())
 	//s.EqualValues(999, result.Val()) // => we can't do that because of using real Redis connection
+}
+
+func (s *ClientTestSuite) TestClient_Rename() {
+	resultSet := s.redisClientWithNamespace.Set("key", 10, 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.Rename("key", "newkey")
+	s.Nil(result.Err())
+	s.EqualValues("OK", result.Val())
+}
+
+func (s *ClientTestSuite) TestClient_RenameNX() {
+	resultSet := s.redisClientWithNamespace.Set("key", 10, 0)
+	s.Nil(resultSet.Err())
+
+	result := s.redisClientWithNamespace.RenameNX("key", "newkey")
+	s.Nil(result.Err())
+	s.EqualValues(true, result.Val())
+
+	key := s.redisClient.Get(fmt.Sprintf("%s:%s", s.namespace, "newkey"))
+	s.Nil(key.Err())
 }
 
 func TestClientTestSuite(t *testing.T) {
