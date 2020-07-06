@@ -15,7 +15,7 @@ import (
 type ClientTestSuite struct {
 	suite.Suite
 
-	redisClient              GoRedis
+	redisClient              redis.Cmdable
 	redisClientWithNamespace *Client
 
 	namespace string
